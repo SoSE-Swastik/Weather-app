@@ -1,59 +1,99 @@
-const apiKey = 'ee8caa7f7ce35e28a0354169328c8fce'; // Replace with your actual API key
-const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=';
-const errorMessage = document.getElementById('error-message');
+function getWeather() {
+    const apiKey = 'ee8caa7f7ce35e28a0354169328c8fce';
+    const city = document.getElementById('city').value;
 
-const cityInput = document.getElementById('city');
-const getWeatherBtn = document.getElementById('get-weather');
-const weatherIcon = document.getElementById('weather-icon');
-const locationEl = document.getElementById('location');
-const tempEl = document.getElementById('temp');
-const descriptionEl = document.getElementById('description');
-
-getWeatherBtn.addEventListener('click', () => {
-    const city = cityInput.value.trim().toLowerCase(); // Trim and lowercase input
-
-    // Check if the input is a valid Indian state or union territory
-    const indianStatesAndUTs = [
-        "andhra pradesh", "arunachal pradesh", "assam", "bihar", "chhattisgarh",
-        "goa", "gujarat", "haryana", "himachal pradesh", "jharkhand", "karnataka",
-        "kerala", "madhya pradesh", "maharashtra", "manipur", "meghalaya",
-        "mizoram", "nagaland", "odisha", "punjab", "rajasthan", "sikkim",
-        "tamil nadu", "telangana", "tripura", "uttar pradesh", "uttarakhand",
-        "west bengal", "andaman and nicobar islands", "chandigarh", "dadra and nagar haveli",
-        "daman and diu", "delhi", "lakshadweep", "puducherry"
-    ];
-    if (!indianStatesAndUTs.includes(city)) {
-        errorMessage.textContent = "Please enter a valid Indian state or union territory.";
+    if (!city) {
+        alert('Please enter a city');
         return;
     }
 
-    fetch(`${apiUrl}${city}&appid=${apiKey}&units=metric`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
+
+    fetch(currentWeatherUrl)
+        .then(response => response.json())
         .then(data => {
-            // Clear previous data
-            locationEl.textContent = "";
-            tempEl.textContent = "";
-            descriptionEl.textContent = "";
-            weatherIcon.src = "";
-
-            console.log(data); // Log the data to the console for debugging
-
-            locationEl.textContent = data.name;
-            tempEl.textContent = `${Math.round(data.main.temp)}°C`;
-            descriptionEl.textContent = data.weather[0].description;
-
-            // Set weather icon based on the weather condition
-            const iconCode = data.weather[0].icon;
-            weatherIcon.src = `http://openweathermap.org/img/wn/${iconCode}@2x.png`;
-            errorMessage.textContent = ""; // Clear the error message if successful
+            displayWeather(data);
         })
         .catch(error => {
-            console.error('Error fetching weather data:', error);
-            errorMessage.textContent = "Error fetching weather data. Please try again later.";
+            console.error('Error fetching current weather data:', error);
+            alert('Error fetching current weather data. Please try again.');
         });
-});
+
+    fetch(forecastUrl)
+        .then(response => response.json())
+        .then(data => {
+            displayHourlyForecast(data.list);
+        })
+        .catch(error => {
+            console.error('Error fetching hourly forecast data:', error);
+            alert('Error fetching hourly forecast data. Please try again.');
+        });
+}
+
+function displayWeather(data) {
+    const tempDivInfo = document.getElementById('temp-div');
+    const weatherInfoDiv = document.getElementById('weather-info');
+    const weatherIcon = document.getElementById('weather-icon');
+    const hourlyForecastDiv = document.getElementById('hourly-forecast');
+
+    // Clear previous content
+    weatherInfoDiv.innerHTML = '';
+    hourlyForecastDiv.innerHTML = '';
+    tempDivInfo.innerHTML = '';
+
+    if (data.cod === '404') {
+        weatherInfoDiv.innerHTML = `<p>${data.message}</p>`;
+    } else {
+        const cityName = data.name;
+        const temperature = Math.round(data.main.temp - 273.15); // Convert to Celsius
+        const description = data.weather[0].description;
+        const iconCode = data.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@4x.png`;
+
+        const temperatureHTML = `
+            <p>${temperature}°C</p>
+        `;
+
+        const weatherHtml = `
+            <p>${cityName}</p>
+            <p>${description}</p>
+        `;
+
+        tempDivInfo.innerHTML = temperatureHTML;
+        weatherInfoDiv.innerHTML = weatherHtml;
+        weatherIcon.src = iconUrl;
+        weatherIcon.alt = description;
+
+        showImage();
+    }
+}
+
+function displayHourlyForecast(hourlyData) {
+    const hourlyForecastDiv = document.getElementById('hourly-forecast');
+
+    const next24Hours = hourlyData.slice(0, 8); // Display the next 24 hours (3-hour intervals)
+
+    next24Hours.forEach(item => {
+        const dateTime = new Date(item.dt * 1000); // Convert timestamp to milliseconds
+        const hour = dateTime.getHours();
+        const temperature = Math.round(item.main.temp - 273.15); // Convert to Celsius
+        const iconCode = item.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}.png`;
+
+        const hourlyItemHtml = `
+            <div class="hourly-item">
+                <span>${hour}:00</span>
+                <img src="${iconUrl}" alt="Hourly Weather Icon">
+                <span>${temperature}°C</span>
+            </div>
+        `;
+
+        hourlyForecastDiv.innerHTML += hourlyItemHtml;
+    });
+}
+
+function showImage() {
+    const weatherIcon = document.getElementById('weather-icon');
+    weatherIcon.style.display = 'block'; // Make the image visible once it's loaded
+}
