@@ -1,48 +1,98 @@
 body {
-    font-family: sans-serif;
+    background: #8C52FF;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
-    background-image: url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80");
-
-    background-size: cover;
-
+    height: 100vh;
+    margin: 0;
 }
 
-.container {
-    background-color: #fff;
+#weather-container {
+    background: rgba(255, 255, 255, 0.3);
+    max-width: 400px;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;
 }
 
-#weather-data {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+h2,
+label,
+p {
+    color: #fff;
+    margin: 8px 0;
+}
+
+input {
+    width: calc(100% - 16px);
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid white;
     margin-top: 20px;
 }
 
-#weather-data img {
+button {
+    background: #debff4;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
     width: 100px;
-    height: 100px;
+    font-size: 15px;
 }
 
-#location {
-    font-size: 24px;
-    font-weight: bold;
+button:hover {
+    background: #8b48d7;
 }
 
-#temp {
-    font-size: 48px;
-    margin-top: 10px;
+#temp-div p {
+    font-size: 60px;
+    margin-top: -30px;
 }
 
-#description {
-    font-size: 18px;
+#weather-info {
+    font-size: 20px;
+}
+
+#weather-icon {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 10px;
+    margin-bottom: 0;
+    display: none;
+}
+
+#hourly-forecast {
+    margin-top: 50px;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+}
+
+.hourly-item {
+    flex: 0 0 auto;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+    color: white;
+}
+
+.hourly-item img {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 5px;
+}
+
+#hourly-heading {
+    color: #fff;
     margin-top: 10px;
 }
